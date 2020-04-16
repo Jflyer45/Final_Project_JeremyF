@@ -1,7 +1,7 @@
 # Jeremy Fisher 4/15/2020
 # These are my basic imports, I will probably need more later.
 from PIL import Image   # I will use this to modify the images.
-import openpyxl, requests, random, webbrowser, urllib.request         # I will use this to make the spread sheet.
+import openpyxl, requests, random, urllib.request, os         # I will use this to make the spread sheet.
 
 
 def ispublicdomain(id):
@@ -61,9 +61,12 @@ while True:
         potentartwork_url = 'https://collectionapi.metmuseum.org/public/collection/v1/objects/' + str(random_id)
         potentartwork_data = requests.get(potentartwork_url).json()
         primaryImageSmall_url = potentartwork_data['primaryImageSmall']
-        webbrowser.open(primaryImageSmall_url)
+        urllib.request.urlretrieve(primaryImageSmall_url, "TempImage.jpg")
+        thumbnail = Image.open('TempImage.jpg')
+        thumbnail.show()
         userinput = input('Do you want this image? (y/n): ').lower()
         if userinput in ['y', 'yes']:
+            os.remove('TempImage.jpg')
             break
         else:
             continue
