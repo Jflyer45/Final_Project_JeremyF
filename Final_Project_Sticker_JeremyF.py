@@ -12,6 +12,21 @@ def ispublicdomain(id):
     if artwork_data['isPublicDomain'] is True:
         return True
 
+# Below is users input validation. This makes sure it's a number and a "real" number
+def makedigitandrange(min, max):
+    while True:
+        userinput = input("Enter a number: ")
+        try:
+            userinput = int(userinput)
+        except:
+            print("Please use digits and whole numbers!")
+            continue
+        if userinput > max:
+            continue
+        if userinput < min:
+            continue
+        return userinput
+
 
 # Setting up the api
 department_url = 'https://collectionapi.metmuseum.org/public/collection/v1/departments'  # This is the api url
@@ -28,20 +43,8 @@ print()                                         # Blank space
 for x, department in enumerate(departments):    # I create a for loop to display all departments using enumerate
     print(str(x + 1) + ".", department)         # I add 1 to x becuase it starts at 0, and I concatenate it with department.
 
+userinput = makedigitandrange(1, len(departments))
 
-# Below is users input validation. This makes sure it's a number and a "real" number
-while True:
-    userinput = input("Enter department number: ")
-    try:
-        userinput = int(userinput)
-    except:
-        print("Please use digits and whole numbers!")
-        continue
-    if userinput > len(departments):
-        continue
-    if userinput < 1:
-        continue
-    break
 
 chosen_department = departments[(userinput - 1)]
 
@@ -74,3 +77,21 @@ while True:
 primaryImage_url = potentartwork_data['primaryImage']
 urllib.request.urlretrieve(primaryImage_url, "chosen_artwork_image.jpg")
 image = Image.open('chosen_artwork_image.jpg')
+
+stickers = os.listdir('Stickers')
+
+print()
+print("Chose a meme sticker or select random")
+
+for x, sticker in enumerate(stickers):
+    print(str(x + 1) + ".", sticker)
+print("5. Random")
+
+userinput = makedigitandrange(1, (len(stickers) + 1))
+
+if userinput == (len(stickers) + 1):
+    userinput = random.randint(1, len(stickers))
+
+selected_sticker = stickers[userinput - 1]
+
+print(selected_sticker)
