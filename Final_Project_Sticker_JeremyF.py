@@ -13,13 +13,26 @@ for entry in departments_data['departments']:               # For every entry (d
     departments.append(entry['displayName'])                # Append the value (department name)
 
 print("Hello! Welcome to Jeremy's Art Sticker Project")     # Welcome text for user
-print("Select from one of the following departments, enter a number")       # Instructs users
+print("Select from one of the following departments, enter a number.")       # Instructs users
 print()                                         # Blank space
 for x, department in enumerate(departments):    # I create a for loop to display all departments using enumerate
     print(str(x + 1) + ".", department)         # I add 1 to x becuase it starts at 0, and I concatenate it with department.
 
-userinput = input("Enter department number: ")
 
-while userinput.isdecimal() is False:
+# Below is users input validation. This makes sure it's a number and a "real" number
+while True:
     userinput = input("Enter department number: ")
+    try:
+        userinput = int(userinput)
+    except:
+        print("Please use digits and whole numbers!")
+        continue
+    if userinput > len(departments):
+        continue
+    if userinput < 1:
+        continue
+    break
+
+
+
 
