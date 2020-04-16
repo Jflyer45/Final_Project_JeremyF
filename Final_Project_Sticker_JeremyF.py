@@ -1,7 +1,7 @@
 # Jeremy Fisher 4/15/2020
 # These are my basic imports, I will probably need more later.
 from PIL import Image   # I will use this to modify the images.
-import openpyxl, requests, random         # I will use this to make the spread sheet.
+import openpyxl, requests, random, webbrowser         # I will use this to make the spread sheet.
 
 
 def ispublicdomain(id):
@@ -51,10 +51,19 @@ total_objects = object_data['total']
 objectid_list = object_data['objectIDs']
 
 while True:
-    random_number = random.randint(0, total_objects)  # I use this varaible to select a random value from the objectid list!!!
+    random_number = random.randint(1, total_objects)  # I use this varaible to select a random value from the objectid list!!!
     random_id = objectid_list[random_number]
     if ispublicdomain(random_id) is False:
         continue
     else:
-        # Under this I will show the image and see if the user wants it
-        print("This is good" + str(random_id))
+        # Under this I will show the image and see if the user wants it.
+        # I NEED TO FIND OUT HOW HE WANTS TO SHOW
+        potentartwork_url = 'https://collectionapi.metmuseum.org/public/collection/v1/objects/' + str(random_id)
+        potentartwork_data = requests.get(potentartwork_url).json()
+        primaryImageSmall_url = potentartwork_data['primaryImageSmall']
+        webbrowser.open(primaryImageSmall_url)
+        userinput = input('Do you want this image? (y/n): ').lower()
+        if userinput in ['y', 'yes']:
+            break
+        else:
+            continue
