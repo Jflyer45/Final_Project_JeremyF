@@ -1,7 +1,7 @@
 # Jeremy Fisher 4/15/2020
 # These are my basic imports, I will probably need more later.
 from PIL import Image   # I will use this to modify the images.
-import openpyxl, requests, random, webbrowser         # I will use this to make the spread sheet.
+import openpyxl, requests, random, webbrowser, urllib.request         # I will use this to make the spread sheet.
 
 
 def ispublicdomain(id):
@@ -67,3 +67,7 @@ while True:
             break
         else:
             continue
+
+primaryImage_url = potentartwork_data['primaryImage']
+urllib.request.urlretrieve(primaryImage_url, "chosen_artwork_image.jpg")
+image = Image.open('chosen_artwork_image.jpg')
