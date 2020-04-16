@@ -36,10 +36,22 @@ while True:
 chosen_department = departments[(userinput - 1)]
 
 objectsurl = 'https://collectionapi.metmuseum.org/public/collection/v1/objects?departmentIds=' + str(userinput)
-oject_data = requests.get(objectsurl).json()
-total_objects = oject_data['total']
-random_number = random.randint(0, total_objects)
+object_data = requests.get(objectsurl).json()
+total_objects = object_data['total']
+objectid_list = object_data['objectIDs']
+
+random_number = random.randint(0, total_objects)            # I use this varaible to select a random value from the objectid list!!!
+random_id = objectid_list[random_number]
+
 
 ### I NEED TO MAKE A FUNCTION THAT CHECKS IF THERE IS A PUBLIC IMAGE AVAIBLE!!!
 
 
+
+def ispublicdomain(id):
+    collection_url = 'https://collectionapi.metmuseum.org/public/collection/v1/objects/' + id
+    artwork_data = requests.get(collection_url).json()
+    if artwork_data['isPublicDomain'] is False:
+        return False
+    if artwork_data['isPublicDomain'] is True:
+        return True
