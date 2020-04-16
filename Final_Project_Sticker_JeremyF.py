@@ -97,12 +97,18 @@ selected_sticker = stickers[userinput - 1]
 sticker = Image.open('Stickers\\' + selected_sticker)
 
 # I will probaby need to resize the the sticker to thumbnail size
+width, height = image.width, image.height
+print(height, width)
+sticker.resize((round(width * .125), round(height * .125)))
 
-stickercopy = sticker.copy()
-stickercopy.paste(image)
 
-stickercopy.show()
+#TO DO--- FIGURE OUT MATH
 
+
+
+
+image.paste(sticker, (0, 100))
+image.show()
 # I need to figure out pasteing
 
 try:
@@ -124,7 +130,7 @@ artsheet = artbook.active
 
 artist = potentartwork_data['artistDisplayName']
 if artist == '':
-    artist = "Unknown"
+    artist = "Unknown or N/A"
 
 workbook_data = [str(potentartwork_data['title']), artist, str(primaryImage_url),
                  str(selected_sticker), str(datetime.datetime.today())]
