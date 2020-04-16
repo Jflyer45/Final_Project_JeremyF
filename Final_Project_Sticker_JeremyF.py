@@ -1,19 +1,25 @@
 # Jeremy Fisher 4/15/2020
 # These are my basic imports, I will probably need more later.
 from PIL import Image   # I will use this to modify the images.
-import openpyxl, requests, random, urllib.request, os, datetime         # I will use this to make the spread sheet.
+import openpyxl, requests, random, urllib.request, os, datetime
 from openpyxl import Workbook
 
+# Validation of the selected object to make sure it's in the public domain.
 def ispublicdomain(id):
     collection_url = 'https://collectionapi.metmuseum.org/public/collection/v1/objects/' + str(id)
-    artwork_data = requests.get(collection_url).json()
+    try:
+        artwork_data = requests.get(collection_url).json()
+    except:
+        print("Couldn't reach the server. Try checking your internet and re-run this program")
+        exit()
     if artwork_data['isPublicDomain'] is False:
         return False
     if artwork_data['isPublicDomain'] is True:
         return True
 
+
 # Below is users input validation. This makes sure it's a number and a "real" number
-def makedigitandrange(min, max):
+def digit_and_range_validation(min, max):
     while True:
         userinput = input("Enter a number: ")
         try:
@@ -28,9 +34,26 @@ def makedigitandrange(min, max):
         return userinput
 
 
+# Validation to make sure the user doesn't chose an empty department.
+def emptydepartmentcheck(url):
+    try:
+        object_data = requests.get(url).json()
+    except:
+        print("Couldn't reach the server. Try checking your internet and re-run this program")
+        exit()
+    if object_data['total'] == 0:
+        return True
+    else:
+        return False
+
 # Setting up the api
+
 department_url = 'https://collectionapi.metmuseum.org/public/collection/v1/departments'  # This is the api url
-departments_data = requests.get(department_url).json()      # I store the data in a variable, using requests
+try:
+    departments_data = requests.get(department_url).json()      # I store the data in a variable, using requests
+except:
+    print("Couldn't reach the server. Try checking your internet and re-run this program")
+    exit()
 
 departments = []                                            # I create an empty string to append to
 # The loop below will get every department
@@ -43,13 +66,23 @@ print()                                         # Blank space
 for x, department in enumerate(departments):    # I create a for loop to display all departments using enumerate
     print(str(x + 1) + ".", department)         # I add 1 to x becuase it starts at 0, and I concatenate it with department.
 
-userinput = makedigitandrange(1, len(departments))
+while True:
+    userinput = digit_and_range_validation(1, len(departments))
+    collectionurl = 'https://collectionapi.metmuseum.org/public/collection/v1/objects?departmentIds='
+    if emptydepartmentcheck((collectionurl + str(userinput))) is True:
+        print("Unfortunally, at this time the department you have selected has no works of art, chose another one.")
+        continue
+    else:
+        break
 
-
+objectsurl = collectionurl + str(userinput)
+try:
+    object_data = requests.get(objectsurl).json()
+except:
+    print("Couldn't reach the server. Try checking your internet and re-run this program")
+    exit()
 chosen_department = departments[(userinput - 1)]
 
-objectsurl = 'https://collectionapi.metmuseum.org/public/collection/v1/objects?departmentIds=' + str(userinput)
-object_data = requests.get(objectsurl).json()
 total_objects = object_data['total']
 objectid_list = object_data['objectIDs']
 
@@ -62,7 +95,11 @@ while True:
         # Under this I will show the image and see if the user wants it.
         # I NEED TO FIND OUT HOW HE WANTS TO SHOW
         potentartwork_url = 'https://collectionapi.metmuseum.org/public/collection/v1/objects/' + str(random_id)
-        potentartwork_data = requests.get(potentartwork_url).json()
+        try:
+            potentartwork_data = requests.get(potentartwork_url).json()
+        except:
+            print("Couldn't reach the server. Try checking your internet and re-run this program")
+            exit()
         primaryImageSmall_url = potentartwork_data['primaryImageSmall']
         urllib.request.urlretrieve(primaryImageSmall_url, "TempImage.jpg")
         thumbnail = Image.open('TempImage.jpg')
@@ -75,7 +112,11 @@ while True:
             continue
 
 primaryImage_url = potentartwork_data['primaryImage']
-urllib.request.urlretrieve(primaryImage_url, "chosen_artwork_image.jpg")
+try:
+    urllib.request.urlretrieve(primaryImage_url, "chosen_artwork_image.jpg")
+except:
+    print("Couldn't reach the server. Try checking your internet and re-run this program")
+    exit()
 image = Image.open('chosen_artwork_image.jpg')
 
 stickers = os.listdir('Stickers')
@@ -87,19 +128,24 @@ for x, sticker in enumerate(stickers):
     print(str(x + 1) + ".", sticker[:-4])
 print("5. Random")
 
-userinput = makedigitandrange(1, (len(stickers) + 1))
+userinput = digit_and_range_validation(1, (len(stickers) + 1))
 
 if userinput == (len(stickers) + 1):
     userinput = random.randint(1, len(stickers))
 
 selected_sticker = stickers[userinput - 1]
 
-sticker = Image.open('Stickers\\' + selected_sticker)
+try:
+    sticker = Image.open('Stickers\\' + selected_sticker)
+except:
+    print("Couldn't find the Stickers folder. Make sure to download it, and not change the name. Keep it in the same "
+          "folder as the python program.")
 
 # I will probaby need to resize the the sticker to thumbnail size
 width, height = image.width, image.height
 print(height, width)
 sticker.resize((round(width * .125), round(height * .125)))
+sticker.rotate(random.randint(-360, 360))
 
 
 #TO DO--- FIGURE OUT MATH
