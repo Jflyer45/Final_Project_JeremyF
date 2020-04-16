@@ -1,7 +1,7 @@
 # Jeremy Fisher 4/15/2020
 # These are my basic imports, I will probably need more later.
 from PIL import Image   # I will use this to modify the images.
-import openpyxl, requests         # I will use this to make the spread sheet.
+import openpyxl, requests, random         # I will use this to make the spread sheet.
 
 # Setting up the api
 department_url = 'https://collectionapi.metmuseum.org/public/collection/v1/departments'  # This is the api url
@@ -33,6 +33,13 @@ while True:
         continue
     break
 
+chosen_department = departments[(userinput - 1)]
 
+objectsurl = 'https://collectionapi.metmuseum.org/public/collection/v1/objects?departmentIds=' + str(userinput)
+oject_data = requests.get(objectsurl).json()
+total_objects = oject_data['total']
+random_number = random.randint(0, total_objects)
+
+### I NEED TO MAKE A FUNCTION THAT CHECKS IF THERE IS A PUBLIC IMAGE AVAIBLE!!!
 
 
