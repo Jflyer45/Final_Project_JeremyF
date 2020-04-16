@@ -1,8 +1,8 @@
 # Jeremy Fisher 4/15/2020
 # These are my basic imports, I will probably need more later.
 from PIL import Image   # I will use this to modify the images.
-import openpyxl, requests, random, urllib.request, os         # I will use this to make the spread sheet.
-
+import openpyxl, requests, random, urllib.request, os, datetime         # I will use this to make the spread sheet.
+from openpyxl import Workbook
 
 def ispublicdomain(id):
     collection_url = 'https://collectionapi.metmuseum.org/public/collection/v1/objects/' + str(id)
@@ -84,7 +84,7 @@ print()
 print("Chose a meme sticker or select random")
 
 for x, sticker in enumerate(stickers):
-    print(str(x + 1) + ".", sticker)
+    print(str(x + 1) + ".", sticker[:-4])
 print("5. Random")
 
 userinput = makedigitandrange(1, (len(stickers) + 1))
@@ -94,4 +94,55 @@ if userinput == (len(stickers) + 1):
 
 selected_sticker = stickers[userinput - 1]
 
-print(selected_sticker)
+sticker = Image.open('Stickers\\' + selected_sticker)
+
+# I will probaby need to resize the the sticker to thumbnail size
+
+stickercopy = sticker.copy()
+stickercopy.paste(image)
+
+stickercopy.show()
+
+# I need to figure out pasteing
+
+try:
+    workbook = openpyxl.load_workbook('StickerArtSheet.xlsx')
+    workbook.close()
+except:
+    workbook = Workbook()
+    sheet = workbook.active  # Make the sheet active
+    sheet.cell(1, 1, 'Title')
+    sheet.cell(1, 2, "Artist")
+    sheet.cell(1, 3, "URL")
+    sheet.cell(1, 4, 'Sticker')
+    sheet.cell(1, 5, 'Date & Time')
+    workbook.save('StickerArtSheet.xlsx')
+    workbook.close()
+
+artbook = openpyxl.load_workbook('StickerArtSheet.xlsx')
+artsheet = artbook.active
+
+artist = potentartwork_data['artistDisplayName']
+if artist == '':
+    artist = "Unknown"
+
+workbook_data = [str(potentartwork_data['title']), artist, str(primaryImage_url),
+                 str(selected_sticker), str(datetime.datetime.today())]
+
+columns_list = list(artsheet.columns)
+columns1 = columns_list[0]
+row = len(columns1) + 1
+
+#for index, data in enumerate(sheet):
+    #sheet.cell(row, index + 1, data)
+
+for thing in workbook_data:
+    print(thing)
+
+# Until I figure out the loop error, I'm keeping this code
+artsheet.cell(row, 1, potentartwork_data['title'])
+artsheet.cell(row, 2, artist)
+artsheet.cell(row, 3, primaryImage_url)
+artsheet.cell(row, 4, selected_sticker)
+artsheet.cell(row, 5, datetime.datetime.today())
+artbook.save('StickerArtSheet.xlsx')
