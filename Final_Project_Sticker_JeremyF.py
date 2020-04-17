@@ -46,155 +46,156 @@ def emptydepartmentcheck(url):
     else:
         return False
 
-# Setting up the api
+def main():
+    # Setting up the api
+    department_url = 'https://collectionapi.metmuseum.org/public/collection/v1/departments'  # This is the api url
+    try:
+        departments_data = requests.get(department_url).json()      # I store the data in a variable, using requests
+    except:
+        print("Couldn't reach the server. Try checking your internet and re-run this program")
+        exit()
 
-department_url = 'https://collectionapi.metmuseum.org/public/collection/v1/departments'  # This is the api url
-try:
-    departments_data = requests.get(department_url).json()      # I store the data in a variable, using requests
-except:
-    print("Couldn't reach the server. Try checking your internet and re-run this program")
-    exit()
+    departments = []                                            # I create an empty string to append to
+    # The loop below will get every department
+    for entry in departments_data['departments']:               # For every entry (department) in the department data
+        departments.append(entry['displayName'])                # Append the value (department name)
 
-departments = []                                            # I create an empty string to append to
-# The loop below will get every department
-for entry in departments_data['departments']:               # For every entry (department) in the department data
-    departments.append(entry['displayName'])                # Append the value (department name)
+    print("Hello! Welcome to Jeremy's Art Sticker Project")     # Welcome text for user
+    print("Select from one of the following departments, enter a number.")       # Instructs users
+    print()                                         # Blank space
+    for x, department in enumerate(departments):    # I create a for loop to display all departments using enumerate
+        print(str(x + 1) + ".", department)         # I add 1 to x becuase it starts at 0, and I concatenate it with department.
 
-print("Hello! Welcome to Jeremy's Art Sticker Project")     # Welcome text for user
-print("Select from one of the following departments, enter a number.")       # Instructs users
-print()                                         # Blank space
-for x, department in enumerate(departments):    # I create a for loop to display all departments using enumerate
-    print(str(x + 1) + ".", department)         # I add 1 to x becuase it starts at 0, and I concatenate it with department.
-
-while True:
-    userinput = digit_and_range_validation(1, len(departments))
-    collectionurl = 'https://collectionapi.metmuseum.org/public/collection/v1/objects?departmentIds='
-    if emptydepartmentcheck((collectionurl + str(userinput))) is True:
-        print("Unfortunally, at this time the department you have selected has no works of art, chose another one.")
-        continue
-    else:
-        break
-
-objectsurl = collectionurl + str(userinput)
-try:
-    object_data = requests.get(objectsurl).json()
-except:
-    print("Couldn't reach the server. Try checking your internet and re-run this program")
-    exit()
-chosen_department = departments[(userinput - 1)]
-
-total_objects = object_data['total']
-objectid_list = object_data['objectIDs']
-
-while True:
-    random_number = random.randint(1, total_objects)  # I use this varaible to select a random value from the objectid list!!!
-    random_id = objectid_list[random_number]
-    if ispublicdomain(random_id) is False:
-        continue
-    else:
-        # Under this I will show the image and see if the user wants it.
-        # I NEED TO FIND OUT HOW HE WANTS TO SHOW
-        potentartwork_url = 'https://collectionapi.metmuseum.org/public/collection/v1/objects/' + str(random_id)
-        try:
-            potentartwork_data = requests.get(potentartwork_url).json()
-        except:
-            print("Couldn't reach the server. Try checking your internet and re-run this program")
-            exit()
-        primaryImageSmall_url = potentartwork_data['primaryImageSmall']
-        urllib.request.urlretrieve(primaryImageSmall_url, "TempImage.jpg")
-        thumbnail = Image.open('TempImage.jpg')
-        thumbnail.show()
-        userinput = input('Do you want this image? (y/n): ').lower()
-        if userinput in ['y', 'yes']:
-            os.remove('TempImage.jpg')
-            break
-        else:
+    while True:
+        userinput = digit_and_range_validation(1, len(departments))
+        collectionurl = 'https://collectionapi.metmuseum.org/public/collection/v1/objects?departmentIds='
+        if emptydepartmentcheck((collectionurl + str(userinput))) is True:
+            print("Unfortunally, at this time the department you have selected has no works of art, chose another one.")
             continue
+        else:
+            break
 
-primaryImage_url = potentartwork_data['primaryImage']
-try:
-    urllib.request.urlretrieve(primaryImage_url, "chosen_artwork_image.jpg")
-except:
-    print("Couldn't reach the server. Try checking your internet and re-run this program")
-    exit()
-image = Image.open('chosen_artwork_image.jpg')
+    objectsurl = collectionurl + str(userinput)
+    try:
+        object_data = requests.get(objectsurl).json()
+    except:
+        print("Couldn't reach the server. Try checking your internet and re-run this program")
+        exit()
+    chosen_department = departments[(userinput - 1)]
 
-stickers = os.listdir('Stickers')
+    total_objects = object_data['total']
+    objectid_list = object_data['objectIDs']
 
-print()
-print("Chose a meme sticker or select random")
+    while True:
+        random_number = random.randint(1, total_objects)  # I use this varaible to select a random value from the objectid list!!!
+        random_id = objectid_list[random_number]
+        if ispublicdomain(random_id) is False:
+            continue
+        else:
+            # Under this I will show the image and see if the user wants it.
+            # I NEED TO FIND OUT HOW HE WANTS TO SHOW
+            potentartwork_url = 'https://collectionapi.metmuseum.org/public/collection/v1/objects/' + str(random_id)
+            try:
+                potentartwork_data = requests.get(potentartwork_url).json()
+            except:
+                print("Couldn't reach the server. Try checking your internet and re-run this program")
+                exit()
+            primaryImageSmall_url = potentartwork_data['primaryImageSmall']
+            urllib.request.urlretrieve(primaryImageSmall_url, "TempImage.jpg")
+            thumbnail = Image.open('TempImage.jpg')
+            thumbnail.show()
+            userinput = input('Do you want this image? (y/n): ').lower()
+            if userinput in ['y', 'yes']:
+                os.remove('TempImage.jpg')
+                break
+            else:
+                continue
 
-for x, sticker in enumerate(stickers):
-    print(str(x + 1) + ".", sticker[:-4])
-print("5. Random")
+    primaryImage_url = potentartwork_data['primaryImage']
+    try:
+        urllib.request.urlretrieve(primaryImage_url, "chosen_artwork_image.jpg")
+    except:
+        print("Couldn't reach the server. Try checking your internet and re-run this program")
+        exit()
+    image = Image.open('chosen_artwork_image.jpg')
 
-userinput = digit_and_range_validation(1, (len(stickers) + 1))
+    stickers = os.listdir('Stickers')
 
-if userinput == (len(stickers) + 1):
-    userinput = random.randint(1, len(stickers))
+    print()
+    print("Chose a meme sticker or select random")
 
-selected_sticker = stickers[userinput - 1]
+    for x, sticker in enumerate(stickers):
+        print(str(x + 1) + ".", sticker[:-4])
+    print("5. Random")
 
-try:
-    sticker = Image.open('Stickers\\' + selected_sticker)
-except:
-    print("Couldn't find the Stickers folder. Make sure to download it, and not change the name. Keep it in the same "
-          "folder as the python program.")
+    userinput = digit_and_range_validation(1, (len(stickers) + 1))
 
-# I will probaby need to resize the the sticker to thumbnail size
-width, height = image.width, image.height
-print(height, width)
-sticker.resize((round(width * .125), round(height * .125)))
-sticker.rotate(random.randint(-360, 360))
+    if userinput == (len(stickers) + 1):
+        userinput = random.randint(1, len(stickers))
+
+    selected_sticker = stickers[userinput - 1]
+
+    try:
+        sticker = Image.open('Stickers\\' + selected_sticker, )
+    except:
+        print("Couldn't find the Stickers folder. Make sure to download it, and not change the name. Keep it in the same "
+              "folder as the python program.")
+
+    # I will probaby need to resize the the sticker to thumbnail size
+    width, height = image.width, image.height
+    sticker.resize((round(width * .125), round(height * .125)))
+    sticker = sticker.rotate(random.randint(-360, 360))
 
 
-#TO DO--- FIGURE OUT MATH
+    #TO DO--- FIGURE OUT MATH
 
+    x_axis = random.randint(0, height - round((height * .125)))
+    y_axis = random.randint(0, width - round((width * .125)))
 
+    image.paste(sticker, (x_axis, y_axis))
+    image.show()
+    # I need to figure out pasteing
 
+    try:
+        workbook = openpyxl.load_workbook('StickerArtSheet.xlsx')
+        workbook.close()
+    except:
+        workbook = Workbook()
+        sheet = workbook.active  # Make the sheet active
+        sheet.cell(1, 1, 'Title')
+        sheet.cell(1, 2, "Artist")
+        sheet.cell(1, 3, "URL")
+        sheet.cell(1, 4, 'Sticker')
+        sheet.cell(1, 5, 'Date & Time')
+        workbook.save('StickerArtSheet.xlsx')
+        workbook.close()
 
-image.paste(sticker, (0, 100))
-image.show()
-# I need to figure out pasteing
+    artbook = openpyxl.load_workbook('StickerArtSheet.xlsx')
+    artsheet = artbook.active
 
-try:
-    workbook = openpyxl.load_workbook('StickerArtSheet.xlsx')
-    workbook.close()
-except:
-    workbook = Workbook()
-    sheet = workbook.active  # Make the sheet active
-    sheet.cell(1, 1, 'Title')
-    sheet.cell(1, 2, "Artist")
-    sheet.cell(1, 3, "URL")
-    sheet.cell(1, 4, 'Sticker')
-    sheet.cell(1, 5, 'Date & Time')
-    workbook.save('StickerArtSheet.xlsx')
-    workbook.close()
+    artist = potentartwork_data['artistDisplayName']
+    if artist == '':
+        artist = "Unknown or N/A"
 
-artbook = openpyxl.load_workbook('StickerArtSheet.xlsx')
-artsheet = artbook.active
+    workbook_data = [str(potentartwork_data['title']), artist, str(primaryImage_url),
+                     str(selected_sticker), str(datetime.datetime.today())]
 
-artist = potentartwork_data['artistDisplayName']
-if artist == '':
-    artist = "Unknown or N/A"
+    columns_list = list(artsheet.columns)
+    columns1 = columns_list[0]
+    row = len(columns1) + 1
 
-workbook_data = [str(potentartwork_data['title']), artist, str(primaryImage_url),
-                 str(selected_sticker), str(datetime.datetime.today())]
+    #for index, data in enumerate(sheet):
+        #sheet.cell(row, index + 1, data)
 
-columns_list = list(artsheet.columns)
-columns1 = columns_list[0]
-row = len(columns1) + 1
+    for thing in workbook_data:
+        print(thing)
 
-#for index, data in enumerate(sheet):
-    #sheet.cell(row, index + 1, data)
+    # Until I figure out the loop error, I'm keeping this code
+    artsheet.cell(row, 1, potentartwork_data['title'])
+    artsheet.cell(row, 2, artist)
+    artsheet.cell(row, 3, primaryImage_url)
+    artsheet.cell(row, 4, selected_sticker)
+    artsheet.cell(row, 5, datetime.datetime.today())
+    artbook.save('StickerArtSheet.xlsx')
 
-for thing in workbook_data:
-    print(thing)
-
-# Until I figure out the loop error, I'm keeping this code
-artsheet.cell(row, 1, potentartwork_data['title'])
-artsheet.cell(row, 2, artist)
-artsheet.cell(row, 3, primaryImage_url)
-artsheet.cell(row, 4, selected_sticker)
-artsheet.cell(row, 5, datetime.datetime.today())
-artbook.save('StickerArtSheet.xlsx')
+main()
