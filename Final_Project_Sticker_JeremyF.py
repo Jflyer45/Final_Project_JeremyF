@@ -152,7 +152,8 @@ def main():
     x_axis = random.randint(0, height - round((height * .125)))
     y_axis = random.randint(0, width - round((width * .125)))
 
-    image.paste(sticker, (x_axis, y_axis))
+    image.paste(sticker.convert('RGBA'), (x_axis, y_axis), sticker.convert('RGBA'))
+
     image.show()
     # I need to figure out pasteing
 
