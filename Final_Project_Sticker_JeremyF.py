@@ -146,16 +146,15 @@ def main():
     sticker.resize((round(width * .125), round(height * .125)))
     sticker = sticker.rotate(random.randint(-130, 130))                 # this rotates the image, but only to 130 either way to it doesn't look odd
 
-
-    #TO DO--- FIGURE OUT MATH
-
-    x_axis = random.randint(round(height * .125), height - round((height * .125)))
-    y_axis = random.randint(round(width * .125), width - round((width * .125)))
+    #### THE ISSUE IM HAVING IS THE ROTATION SOMETIMES GOES OUT SIDE THE BOARDER!!!!
+    x_axis = random.randint(round(width * .125), width - round((width * .125)) - round(height * .125))
+    y_axis = random.randint(round(height * .125), height - round((height * .125)) - round(width * .125))
 
     image.paste(sticker.convert('RGBA'), (x_axis, y_axis), sticker.convert('RGBA'))
 
     image.show()
-    # I need to figure out pasteing
+    image.save("Art_and_Sticker.jpeg")
+    print()
 
     try:
         workbook = openpyxl.load_workbook('StickerArtSheet.xlsx')
