@@ -155,7 +155,7 @@ def main():                                                     # This is the ma
     # I will probaby need to resize the the sticker to thumbnail size
     width, height = image.width, image.height                       # Gets the artwork image height and width
     sticker.resize((round(width * .125), round(height * .125)))     # I resize the sticker to 1/8 the artwork image to keep aspect ratio
-    sticker = sticker.rotate(random.randint(-130, 130))             # this rotates the image, but only to 130 either way to it doesn't look odd
+    sticker = sticker.rotate(random.randint(-90, 90))             # this rotates the image, but only to 90 either way to it doesn't look odd
 
     #### THE ISSUE IM HAVING IS THE ROTATION SOMETIMES GOES OUT SIDE THE BOARDER!!!!
     # I have tried many attempts to fix it, in almost all cases the sticker is just fine, but it seems to sometimes not work
