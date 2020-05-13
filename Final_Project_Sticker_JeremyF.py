@@ -1,55 +1,61 @@
-# Jeremy Fisher 4/15/2020
-# These are my basic imports, I will probably need more later.
-from PIL import Image   # I will use this to modify the images.
-import openpyxl, requests, random, urllib.request, os, datetime
-from openpyxl import Workbook
+# Jeremy Fisher 5/13/2020
+
+try:                                                                    # To stop any errors
+    from PIL import Image                                               # I will use this to modify the images.
+    import openpyxl, requests, random, urllib.request, os, datetime     # Some more imports I'll need
+    from openpyxl import Workbook                                       # Import the workbook
+except:                                                                 # This will happen if they don't have one of the imports
+    print('You are lacking one of the required modules, makes sure you have: PIL, ' # Explains error
+          'openpyxl, requests, random, urllib.reqyests, os, and datetime!')         # See above
+    exit()                                                                          # I stop the program to stop any crashes
+
 
 # Validation of the selected object to make sure it's in the public domain.
-def ispublicdomain(id):
-    collection_url = 'https://collectionapi.metmuseum.org/public/collection/v1/objects/' + str(id)
-    try:
-        artwork_data = requests.get(collection_url).json()
-    except:
-        print("Couldn't reach the server. Try checking your internet and re-run this program")
-        exit()
-    if artwork_data['isPublicDomain'] is False:
-        return False
-    if artwork_data['isPublicDomain'] is True:
-        return True
+def ispublicdomain(id):                                                                             # I define a new function with the param as id
+    collection_url = 'https://collectionapi.metmuseum.org/public/collection/v1/objects/' + str(id)  # Makes the url with using the id
+    try:                                                                                            # Prevent crashes, most likely due to internet issues
+        artwork_data = requests.get(collection_url).json()                                          # I get the info in json format
+    except:                                                                                         # This is what happens if error
+        print("Couldn't reach the server. Try checking your internet and re-run this program")      # Explains to user
+        exit()                                                                                      # Stops the program
+    if artwork_data['isPublicDomain'] is False:                                                     # If inside the data the key isPublicDomain is false
+        return False                                            # The function returns the value False
+    if artwork_data['isPublicDomain'] is True:                  # If inside the data the key isPublicDomain is True
+        return True                                             # The function returns True
 
 
 # Below is users input validation. This makes sure it's a number and a "real" number
-def digit_and_range_validation(min, max):
-    while True:
-        userinput = input("Enter a number: ")
-        try:
-            userinput = int(userinput)
-        except:
-            print("Please use digits and whole numbers!")
-            continue
-        if userinput > max:
-            continue
-        if userinput < min:
-            continue
-        return userinput
+def digit_and_range_validation(min, max):                       # I define the function with min and max expected values as the params
+    while True:                                                 # The function loop
+        userinput = input("Enter a number: ")                   # Makes a variable of the user's input with the instructions
+        try:                                                    # Prevent an error
+            userinput = int(userinput)                          # Tries to make the input a int
+        except:                                                 # If the input is not an int
+            print("Please use digits and whole numbers!")       # Instructs the user
+            continue                                            # Restarts the loop
+        if userinput > max:                                     # Checks if the input is above the expected max
+            continue                                            # Restarts the loop
+        if userinput < min:                                     # Checks if the input is under the expected min
+            continue                                            # Restarts the loop
+        return userinput                                        # If all the checks pass, it returns the input
 
 
 # Validation to make sure the user doesn't chose an empty department.
-def emptydepartmentcheck(url):
-    try:
-        object_data = requests.get(url).json()
-    except:
-        print("Couldn't reach the server. Try checking your internet and re-run this program")
-        exit()
-    if object_data['total'] == 0:
-        return True
-    else:
-        return False
+def emptydepartmentcheck(url):                                  # Makes a function with url as the param
+    try:                                                        # Prevents crashing if there's no internet
+        object_data = requests.get(url).json()                  # Gets the data
+    except:                                                     # If failed, do this
+        print("Couldn't reach the server. Try checking your internet and re-run this program")  # Gives info to user
+        exit()                                                  # Stops the program
+    if object_data['total'] == 0:                               # If inside the data in the total key and the value is 0
+        return True                                             # Returns True
+    else:                                                       # Otherwise
+        return False                                            # The data is full of info and returns False
 
-def main():
+def main():                                                     # This is the main loop
     # Setting up the api
     department_url = 'https://collectionapi.metmuseum.org/public/collection/v1/departments'  # This is the api url
-    try:
+    try:                                                            # Prevents the crash
         departments_data = requests.get(department_url).json()      # I store the data in a variable, using requests
     except:
         print("Couldn't reach the server. Try checking your internet and re-run this program")
@@ -147,8 +153,8 @@ def main():
     sticker = sticker.rotate(random.randint(-130, 130))                 # this rotates the image, but only to 130 either way to it doesn't look odd
 
     #### THE ISSUE IM HAVING IS THE ROTATION SOMETIMES GOES OUT SIDE THE BOARDER!!!!
-    x_axis = random.randint(round(width * .125), width - round((width * .125)) - round(height * .125))
-    y_axis = random.randint(round(height * .125), height - round((height * .125)) - round(width * .125))
+    x_axis = random.randint(round(width * .125), width - round((width * .125)) - round(height * .125) -100)
+    y_axis = random.randint(round(height * .125), height - round((height * .125)) - round(width * .125) -100)
 
     image.paste(sticker.convert('RGBA'), (x_axis, y_axis), sticker.convert('RGBA'))
 
