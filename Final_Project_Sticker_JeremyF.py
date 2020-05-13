@@ -125,82 +125,86 @@ def main():                                                     # This is the ma
         print("Couldn't reach the server. Try checking your internet and re-run this program")  # Tells user why
         exit()                                                                                  # Stops
     image = Image.open('chosen_artwork_image.jpg')                  # Opens the image object
-    stickers = os.listdir('Stickers')                               # IMPORTANT: Makes a list of the stickers so it doesn't matter which stickers are added!!!
+    try:                                                            # Tries to get the folder contents
+        stickers = os.listdir('Stickers')                           # IMPORTANT: Makes a list of the stickers so it doesn't matter which stickers are added!!!
+    except:                                                         # if it failed
+        print("You are missing the 'sticker' folder. Make sure to download it, "               # Explained why it failed
+              "and not change the name. Keep it in the same folder as the python program.")    # Explained why it failed
+        exit()                                                      # Stops the program
     print()                                                         # Blank space
     print("Chose a meme sticker or select random")                  # Instructs user
 
     for x, sticker in enumerate(stickers):                          # Lists the sticker options
         print(str(x + 1) + ".", sticker[:-4])                       # Formats the sting that will repeat
-    print(str(len(stickers) + 1) + ". Random")                      # Adds the
+    print(str(len(stickers) + 1) + ". Random")                      # Adds the random option
 
-    userinput = digit_and_range_validation(1, (len(stickers) + 1))
+    userinput = digit_and_range_validation(1, (len(stickers) + 1))  # Gets the user input and validates it.
 
-    if userinput == (len(stickers) + 1):
-        userinput = random.randint(1, len(stickers))
+    if userinput == (len(stickers) + 1):                            # if the user chooses the last option (Random)
+        userinput = random.randint(1, len(stickers))                # makes the userinput a random number, that represents a sticker
 
-    selected_sticker = stickers[userinput - 1]
+    selected_sticker = stickers[userinput - 1]                      # Finalizes the sticker in a variable.
 
-    try:
-        sticker = Image.open('Stickers\\' + selected_sticker, )
+    try:                                                            # It tries to open the image
+        sticker = Image.open('Stickers\\' + selected_sticker, )     # Tries to open
     except:
         print("Couldn't find the Stickers folder. Make sure to download it, and not change the name. Keep it in the same "
-              "folder as the python program.")
+              "folder as the python program.")                      # Explains to user
+        exit()                                                      # Stops the program
 
     # I will probaby need to resize the the sticker to thumbnail size
-    width, height = image.width, image.height
-    sticker.resize((round(width * .125), round(height * .125)))
-    sticker = sticker.rotate(random.randint(-130, 130))                 # this rotates the image, but only to 130 either way to it doesn't look odd
+    width, height = image.width, image.height                       # Gets the artwork image height and width
+    sticker.resize((round(width * .125), round(height * .125)))     # I resize the sticker to 1/8 the artwork image to keep aspect ratio
+    sticker = sticker.rotate(random.randint(-130, 130))             # this rotates the image, but only to 130 either way to it doesn't look odd
 
     #### THE ISSUE IM HAVING IS THE ROTATION SOMETIMES GOES OUT SIDE THE BOARDER!!!!
-    x_axis = random.randint(round(width * .125), width - round((width * .125)) - round(height * .125) -100)
-    y_axis = random.randint(round(height * .125), height - round((height * .125)) - round(width * .125) -100)
+    # I have tried many attempts to fix it, in almost all cases the sticker is just fine, but it seems to sometimes not work
+    x_axis = random.randint(round(width * .125), width - round((width * .125)) - round(height * .125) -100)     # Gets a random cooridate
+    y_axis = random.randint(round(height * .125), height - round((height * .125)) - round(width * .125) -100)   # Gets a random cooridate
 
-    image.paste(sticker.convert('RGBA'), (x_axis, y_axis), sticker.convert('RGBA'))
+    image.paste(sticker.convert('RGBA'), (x_axis, y_axis), sticker.convert('RGBA'))     # Applies the sticker without background
+    image.show()                                                                        # Shows the user
+    image.save("Art_and_Sticker.jpeg")                              # Saves the final picture
+    print()                                                         # Blank space
 
-    image.show()
-    image.save("Art_and_Sticker.jpeg")
-    print()
+    try:                                                            # Tries to open a pre-existing exel sheet
+        workbook = openpyxl.load_workbook('StickerArtSheet.xlsx')   # Opens the workbook
+        workbook.close()                                            # Closes the book if so
+    except:                                                         # Otherwise the book doesn't exist, so time to set it up!
+        workbook = Workbook()                                   # Calls the work book function
+        sheet = workbook.active                                 # Make the sheet active
+        sheet.cell(1, 1, 'Title')                               # Makes the first cell the title section
+        sheet.cell(1, 2, "Artist")                              # Makes the next section Artist
+        sheet.cell(1, 3, "URL")                                 # Makes the next section URl
+        sheet.cell(1, 4, 'Sticker')                             # Makes the next section Sticker
+        sheet.cell(1, 5, 'Date & Time')                         # Makes the next section Date and time
+        workbook.save('StickerArtSheet.xlsx')                   # Saves the excel sheet
+        workbook.close()                                        # Closes the sheet
 
-    try:
-        workbook = openpyxl.load_workbook('StickerArtSheet.xlsx')
-        workbook.close()
-    except:
-        workbook = Workbook()
-        sheet = workbook.active  # Make the sheet active
-        sheet.cell(1, 1, 'Title')
-        sheet.cell(1, 2, "Artist")
-        sheet.cell(1, 3, "URL")
-        sheet.cell(1, 4, 'Sticker')
-        sheet.cell(1, 5, 'Date & Time')
-        workbook.save('StickerArtSheet.xlsx')
-        workbook.close()
+    artbook = openpyxl.load_workbook('StickerArtSheet.xlsx')    # Opens the sheet
+    artsheet = artbook.active                                   # Makes it active
 
-    artbook = openpyxl.load_workbook('StickerArtSheet.xlsx')
-    artsheet = artbook.active
+    artist = potentartwork_data['artistDisplayName']            # Gets the artist's name
+    if artist == '':                                            # Checks if the artist is nothing
+        artist = "Unknown or N/A"                               # if it is, makes the artist Unknown
 
-    artist = potentartwork_data['artistDisplayName']
-    if artist == '':
-        artist = "Unknown or N/A"
+    workbook_data = [str(potentartwork_data['title']), artist, str(primaryImage_url),   # Makes the set of data
+                     str(selected_sticker), str(datetime.datetime.today())]             # Indented for readiblity
 
-    workbook_data = [str(potentartwork_data['title']), artist, str(primaryImage_url),
-                     str(selected_sticker), str(datetime.datetime.today())]
+    columns_list = list(artsheet.columns)               # Gets the columns as a list
+    columns1 = columns_list[0]                          # Makes column 1 the first entry of the list
+    row = len(columns1) + 1                             # makes row number the one after the prexisteng row
 
-    columns_list = list(artsheet.columns)
-    columns1 = columns_list[0]
-    row = len(columns1) + 1
+    for thing in workbook_data:                         # Prints to user the info saved
+        print(thing)                                    # The actually printing action
 
-    #for index, data in enumerate(sheet):
-        #sheet.cell(row, index + 1, data)
+    # Due to the loop not working, I hard coded this part
+    artsheet.cell(row, 1, potentartwork_data['title'])  # Saves the artwork name
+    artsheet.cell(row, 2, artist)                       # Saves the artist
+    artsheet.cell(row, 3, primaryImage_url)             # Saves the URL
+    artsheet.cell(row, 4, selected_sticker)             # Saves the sticker
+    artsheet.cell(row, 5, datetime.datetime.today())    # Saves the time and date
+    artbook.save('StickerArtSheet.xlsx')                # Saves the new edits to the workbook
 
-    for thing in workbook_data:
-        print(thing)
 
-    # Until I figure out the loop error, I'm keeping this code
-    artsheet.cell(row, 1, potentartwork_data['title'])
-    artsheet.cell(row, 2, artist)
-    artsheet.cell(row, 3, primaryImage_url)
-    artsheet.cell(row, 4, selected_sticker)
-    artsheet.cell(row, 5, datetime.datetime.today())
-    artbook.save('StickerArtSheet.xlsx')
-
-main()
+main()                                                  # Runs the main code
