@@ -164,7 +164,7 @@ def main():                                                     # This is the ma
 
     image.paste(sticker.convert('RGBA'), (x_axis, y_axis), sticker.convert('RGBA'))     # Applies the sticker without background
     image.show()                                                                        # Shows the user
-    image.save("Art_and_Sticker.jpeg")                              # Saves the final picture
+    image.save(str(potentartwork_data['title']) + "and" + str(selected_sticker[0:-4]) + ".jpeg")                # Saves the final picture
     print()                                                         # Blank space
 
     try:                                                            # Tries to open a pre-existing exel sheet
