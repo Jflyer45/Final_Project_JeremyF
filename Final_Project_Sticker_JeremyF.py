@@ -9,6 +9,14 @@ except:                                                                 # This w
           'openpyxl, requests, random, urllib.reqyests, os, and datetime!')         # See above
     exit()                                                                          # I stop the program to stop any crashes
 
+# Prevents crashing if no internet
+def try_get_url(url):
+    try:                                                        # Prevents crashing if there's no internet
+        data = requests.get(url).json()                         # Gets the data
+    except:                                                     # If failed, do this
+        print("Couldn't reach the server. Try checking your internet and re-run this program")  # Gives info to user
+        exit()                                                  # Stops the program
+    return data                                                 # If nothing failed return the data
 
 # Validation of the selected object to make sure it's in the public domain.
 def ispublicdomain(id):                                                                             # I define a new function with the param as id
@@ -42,11 +50,7 @@ def digit_and_range_validation(min, max):                       # I define the f
 
 # Validation to make sure the user doesn't chose an empty department.
 def emptydepartmentcheck(url):                                  # Makes a function with url as the param
-    try:                                                        # Prevents crashing if there's no internet
-        object_data = requests.get(url).json()                  # Gets the data
-    except:                                                     # If failed, do this
-        print("Couldn't reach the server. Try checking your internet and re-run this program")  # Gives info to user
-        exit()                                                  # Stops the program
+    object_data = try_get_url(url)                              # Gets the data
     if object_data['total'] == 0:                               # If inside the data in the total key and the value is 0
         return True                                             # Returns True
     else:                                                       # Otherwise
@@ -55,12 +59,7 @@ def emptydepartmentcheck(url):                                  # Makes a functi
 def main():                                                     # This is the main loop
     # Setting up the api
     department_url = 'https://collectionapi.metmuseum.org/public/collection/v1/departments'  # This is the api url
-    try:                                                            # Prevents the crash
-        departments_data = requests.get(department_url).json()      # I store the data in a variable, using requests
-    except:                                                         # If it does fail...
-        print("Couldn't reach the server. Try checking your internet and re-run this program")  # Explains failure
-        exit()                                                  # The program is stopped
-
+    departments_data = try_get_url(department_url)              # I store the data in a variable, using requests
     departments = []                                            # I create an empty string to append to
     # The loop below will get every department
     for entry in departments_data['departments']:               # For every entry (department) in the department data
@@ -83,11 +82,7 @@ def main():                                                     # This is the ma
             break                                           # So the loop can be broke
 
     objectsurl = collectionurl + str(userinput)             # Combines the default url with the selected id
-    try:                                                    # Prevents the crash
-        object_data = requests.get(objectsurl).json()       # Finally gets the data for the last time
-    except:                                                 # If it fails
-        print("Couldn't reach the server. Try checking your internet and re-run this program")  # Explains
-        exit()                                              # Stops the program
+    object_data = try_get_url(objectsurl)                   # Finally gets the data for the last time
 
     total_objects = object_data['total']                    # Gets the number of artworks
     objectid_list = object_data['objectIDs']                # Gets the list of object ids
